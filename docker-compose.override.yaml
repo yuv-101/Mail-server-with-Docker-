@@ -1,0 +1,23 @@
+version: '2.1'
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: always
+    environment:
+      # These collections contain the logic to detect Postfix/Dovecot attacks
+      COLLECTIONS: "crowdsecurity/linux crowdsecurity/postfix crowdsecurity/dovecot crowdsecurity/nginx"
+      GID: "${MAILCOW_GID:-1000}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/conf/crowdsec/acquis.yaml:/etc/crowdsec/acquis.yaml
+      - crowdsec-db:/var/lib/crowdsec/data/
+      - crowdsec-config:/etc/crowdsec/
+    networks:
+      mailcow-network:
+        aliases:
+          - crowdsec
+
+volumes:
+  crowdsec-db:
+  crowdsec-config:
